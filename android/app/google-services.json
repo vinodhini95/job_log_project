@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "477370392345",
+    "project_id": "gnb-project-72b87",
+    "storage_bucket": "gnb-project-72b87.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477370392345:android:043411cad62436c635ef88",
+        "android_client_info": {
+          "package_name": "com.GnbProject.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtCHC8ZvICNxR1FyKCrCn6AFTCMA7A6EI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
