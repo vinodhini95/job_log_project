@@ -1,4 +1,6 @@
+
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_bar.dart';
@@ -36,7 +38,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
 
       if (kIsWeb) {
         // Request camera access from the browser
-        pickedFile = await picker.pickImage(source: ImageSource.gallery);
+        pickedFile = await picker.pickImage(source: ImageSource.camera);
       } else {
         // For Android or iOS (or desktop fallback)
         pickedFile = await picker.pickImage(source: ImageSource.camera);
