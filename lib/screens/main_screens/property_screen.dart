@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_bar.dart';
 import 'package:gnb_project/dynamic_widget/utils/helper_service.dart';
@@ -55,12 +56,19 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Main Image
-                      Image.file(
-                        File(widget.property.imagePath.path),
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
+                      kIsWeb
+                          ? Image.network(
+                              widget.property.imagePath.path,
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.file(
+                              File(widget.property.imagePath.path),
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
 
                       // Small Preview Images
                       SizedBox(
@@ -72,12 +80,19 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                             padding: const EdgeInsets.all(4.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(widget.property.imagePath.path),
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                              ),
+                              child: kIsWeb
+                                  ? Image.network(
+                                      widget.property.imagePath.path,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      File(widget.property.imagePath.path),
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                         ),
@@ -151,22 +166,29 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
             body: TabBarView(
               children: [
                 // Tab 1: Description
-                 Padding(
+                Padding(
                   padding: EdgeInsets.all(16.0),
-                  child: HelperService().getTextFieldStyle("Spacious and stylish apartment in a prime location. Modern amenities with a great view.",TextStyle(fontSize: 14)),
+                  child: HelperService().getTextFieldStyle(
+                    "Spacious and stylish apartment in a prime location. Modern amenities with a great view.",
+                    TextStyle(fontSize: 14),
+                  ),
                 ),
 
                 // Tab 2: Gallery Grid
                 GalleryGrid(imagePath: widget.property.imagePath.path),
 
                 // Tab 3: Review Placeholder
-                 Center(child:  HelperService().getTextFieldStyle("Review tab coming soon",TextStyle(fontSize: 12))),
+                Center(
+                  child: HelperService().getTextFieldStyle(
+                    "Review tab coming soon",
+                    TextStyle(fontSize: 12),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
-      
     );
   }
 }
@@ -190,12 +212,19 @@ class GalleryGrid extends StatelessWidget {
         ),
         itemBuilder: (_, index) => ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            File(images[index]),
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
+          child: kIsWeb
+              ? Image.network(
+                  images[index],
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                )
+              : Image.file(
+                  File(images[index]),
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
         ),
       ),
     );

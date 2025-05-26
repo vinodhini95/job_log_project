@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_auth_elevator_btn.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_text_field.dart';
@@ -207,7 +208,8 @@ class HelperService {
   getImageCicularImage(String filePath) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Image.file(
+      child:kIsWeb
+        ? Image.network(filePath, width: 100, height: 100, fit: BoxFit.cover): Image.file(
         File(filePath),
         fit: BoxFit.cover,
         width: 80,
