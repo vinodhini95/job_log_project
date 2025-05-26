@@ -7,5 +7,7 @@ Color primaryColor = Color(wihteColor);
 Color globalColor = Color(color);
 Color greyColor = const Color.fromARGB(255, 108, 107, 107);
 Color blackColor = Colors.black;
+Color orangeColor = Colors.orange;
+Color blueColor = Colors.blue;
 
 String fontFamily = "PT Sans Narrow";

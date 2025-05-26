@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_auth_elevator_btn.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_text_field.dart';
@@ -55,14 +57,15 @@ class HelperService {
                               getCenterTextAlign("Location Select"),
                               SizedBox(height: 10),
                               DropdownTextField(
-                                onchangeValue:(value) {
+                                onchangeValue: (value) {
                                   jobLogProvider.setLocation(value!);
                                 },
-                                selectedValue: jobLogProvider.selectedLocationValue,
+                                selectedValue:
+                                    jobLogProvider.selectedLocationValue,
                                 labelText: 'Select Location',
                                 listData: jobLogProvider.locations,
                               ),
-                               SizedBox(height: 10),
+                              SizedBox(height: 10),
                             ],
                           );
                         },
@@ -195,12 +198,67 @@ class HelperService {
     return Text(textField, style: textStyle);
   }
 
-//flutter Tost Message
-showTostMessage(String? errorMessage, BuildContext context) {
-    WindowsToast.show(
-      errorMessage!,
-      context,
-      30,
+  //flutter Tost Message
+  showTostMessage(String? errorMessage, BuildContext context) {
+    WindowsToast.show(errorMessage!, context, 30);
+  }
+
+  //get circular Image
+  getImageCicularImage(String filePath) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.file(
+        File(filePath),
+        fit: BoxFit.cover,
+        width: 80,
+        height: 80,
+      ),
+    );
+  }
+
+  //fav Icon Widget
+  getFavIcon() {
+    return Container(
+      decoration: BoxDecoration(shape: BoxShape.circle, color: primaryColor),
+      padding: const EdgeInsets.all(4),
+      child: Icon(Icons.favorite, color: globalColor, size: 16),
+    );
+  }
+
+  //get width sized box
+  getSizedboxwidth(double widthvalue) {
+    return SizedBox(width: widthvalue);
+  }
+
+  //get height sized box
+  getSizedboxheight(double heightvalue) {
+    return SizedBox(height: heightvalue);
+  }
+
+  //get star icon
+  getStarIcons() {
+    return Icon(Icons.star, color: orangeColor, size: 16);
+  }
+
+  //getText field
+  getTextField(String textField) {
+    return Text(textField, style: TextStyle(fontSize: 12));
+  }
+
+  //get Text field with style
+  getTextFieldStyle(String textField, TextStyle textStyle) {
+    return Text(textField, style: textStyle);
+  }
+
+  //show Title with border style
+  getTextFieldContainer(String textField, TextStyle textStyle) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.blue[100],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: getTextFieldStyle(textField, textStyle),
     );
   }
 }
