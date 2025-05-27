@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/material.dart';
+import 'package:gnb_project/model/property_list_model.dart';
 import 'package:gnb_project/model/property_model.dart';
 import 'package:gnb_project/service/service_file/api_service.dart';
 
@@ -18,15 +19,23 @@ class JobLogProvider extends ChangeNotifier {
   final List<JobLogmodel> _listJobLogs = [];
   List<JobLogmodel> get listJobLogs => _listJobLogs;
 
+  //set variable for list of joblogs
+  final List<Propertylist> _listProperties = [];
+  List<Propertylist> get listProperties => _listProperties;
   final List<Property> _listProperty = [];
   List<Property> get listProperty => _listProperty;
 
   int currentPage = 1;
+  int currentPropertyPage = 1;
+  int pageSize = 20;
   bool _isLoading = false;
   bool _hasMore = true;
   bool get isLoading => _isLoading;
   bool get hasMore => _hasMore;
-
+  bool _isPropertyLoading = false;
+  bool _hasPropertyMore = true;
+  bool get isPropertyLoading => _isPropertyLoading;
+  bool get hasPropertyMore => _hasPropertyMore;
   RangeValues _priceRange = RangeValues(1, 10);
   RangeValues get priceRange => _priceRange;
   final List<String> locations = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai'];
@@ -84,5 +93,35 @@ class JobLogProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+ Future<List<Propertylist>> getPropertyList()async{
+    if (_isPropertyLoading || !_hasPropertyMore) return _listProperties;
+
+    _isPropertyLoading = true;
+
+    try {
+      final data = await _apiService.fetchPropertylist(currentPropertyPage, pageSize);
+
+      if (data['properties'] != null) {
+        final List<dynamic> newProperties = data['properties'];
+        for (var property in newProperties) {
+           _listProperties.add(Propertylist.fromJson(property));
+        }
+       
+        currentPropertyPage++;
+
+        if (newProperties.isEmpty || newProperties.length < pageSize) {
+          _hasPropertyMore = false;
+        }
+      } else {
+        _hasPropertyMore = false;
+      }
+      return _listProperties;
+    } catch (e) {
+      return _listProperties;
+    } finally {
+      _isPropertyLoading = false;
+      notifyListeners();
+    }
+  }
   }
 

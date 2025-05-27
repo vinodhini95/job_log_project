@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_auth_elevator_btn.dart';
@@ -46,7 +47,6 @@ class HelperService {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               getCenterTextAlign("Price Range"),
-
                               getSlideRangeValue(
                                 context,
                                 jobLogProvider.priceRange,
@@ -54,7 +54,6 @@ class HelperService {
                                   jobLogProvider.setPriceRange(values);
                                 },
                               ),
-
                               getCenterTextAlign("Location Select"),
                               SizedBox(height: 10),
                               DropdownTextField(
@@ -71,7 +70,6 @@ class HelperService {
                           );
                         },
                       ),
-
                       getCenterTextAlign("Date Filter"),
                       SizedBox(height: 10),
                       AppTextFormField(
@@ -208,12 +206,16 @@ class HelperService {
   getImageCicularImage(String filePath) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child:kIsWeb
-        ? Image.network(filePath, width: 100, height: 100, fit: BoxFit.cover): Image.file(
-        File(filePath),
-        fit: BoxFit.cover,
-        width: 80,
+      child: CachedNetworkImage(
+        fit: BoxFit.contain,
+        imageUrl: filePath.isNotEmpty
+            ? filePath
+            : 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dvilla&psig=AOvVaw3XPEJWzhm5YocHrk4LjwXg&ust=1748437256275000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNiO3b7aw40DFQAAAAAdAAAAABAE',
         height: 80,
+        width: 80,
+        placeholder: (context, url) =>
+            const Center(child: CircularProgressIndicator()),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
   }

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_bar.dart';
 import 'package:gnb_project/dynamic_widget/utils/helper_service.dart';
 import 'package:gnb_project/dynamic_widget/utils/styles.dart';
-import 'package:gnb_project/model/property_model.dart';
+import 'package:gnb_project/model/property_list_model.dart';
 import 'package:gnb_project/service/service_file/analyse_service.dart';
 
 class PropertyDetailPage extends StatefulWidget {
-  final Property property;
+  final Propertylist property;
 
   const PropertyDetailPage({required this.property, Key? key})
-    : super(key: key);
+      : super(key: key);
 
   @override
   _PropertyDetailPageState createState() => _PropertyDetailPageState();
@@ -24,13 +24,13 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
   void initState() {
     super.initState();
     _entryTime = DateTime.now();
-    AnalyticsManager().logView(widget.property.id);
+    AnalyticsManager().logView(widget.property.id!);
   }
 
   @override
   void dispose() {
     final timeSpent = DateTime.now().difference(_entryTime);
-    AnalyticsManager().logTimeSpent(widget.property.id, timeSpent);
+    AnalyticsManager().logTimeSpent(widget.property.id!, timeSpent);
     super.dispose();
   }
 
@@ -56,47 +56,39 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Main Image
-                      kIsWeb
-                          ? Image.network(
-                              widget.property.imagePath.path,
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.file(
-                              File(widget.property.imagePath.path),
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
+                      if (widget.property.images != null &&
+                          widget.property.images!.isNotEmpty)
+                        Image.network(
+                          widget.property.images![0],
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
 
                       // Small Preview Images
-                      SizedBox(
-                        height: 60,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 5,
-                          itemBuilder: (_, index) => Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: kIsWeb
-                                  ? Image.network(
-                                      widget.property.imagePath.path,
+                      if (widget.property.images != null &&
+                          widget.property.images!.isNotEmpty)
+                        SizedBox(
+                          height: 60,
+                          child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: widget.property.images!.length,
+                              itemBuilder: (_, index) {
+                                var imagePath = widget.property.images![index];
+                                return Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      imagePath,
                                       width: 100,
                                       height: 100,
                                       fit: BoxFit.cover,
-                                    )
-                                  : Image.file(
-                                      File(widget.property.imagePath.path),
-                                      width: 60,
-                                      height: 60,
-                                      fit: BoxFit.cover,
                                     ),
-                            ),
-                          ),
+                                  ),
+                                );
+                              }),
                         ),
-                      ),
 
                       // Title + Rating + Location
                       Padding(
@@ -175,7 +167,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                 ),
 
                 // Tab 2: Gallery Grid
-                GalleryGrid(imagePath: widget.property.imagePath.path),
+
+                GalleryGrid(images: widget.property.images!),
 
                 // Tab 3: Review Placeholder
                 Center(
@@ -195,12 +188,11 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
 
 // ignore: must_be_immutable
 class GalleryGrid extends StatelessWidget {
-  String imagePath;
-  GalleryGrid({super.key, required this.imagePath});
+  List<String> images;
+  GalleryGrid({super.key, required this.images});
 
   @override
   Widget build(BuildContext context) {
-    final images = List.generate(6, (index) => imagePath); // Replace
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: GridView.builder(
@@ -212,19 +204,12 @@ class GalleryGrid extends StatelessWidget {
         ),
         itemBuilder: (_, index) => ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: kIsWeb
-              ? Image.network(
-                  images[index],
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                )
-              : Image.file(
-                  File(images[index]),
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
+          child: Image.network(
+            images[index],
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );
