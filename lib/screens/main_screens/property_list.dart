@@ -18,7 +18,8 @@ class PropertyListPage extends StatefulWidget {
 
 class _PropertyListPageState extends State<PropertyListPage> {
   final ScrollController _scrollController = ScrollController();
-
+  bool shows = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -49,15 +50,57 @@ class _PropertyListPageState extends State<PropertyListPage> {
         appBar: AppBar(),
         backButton: true,
         title: "Properties",
+        onTap: () {
+          setState(() {
+            shows = true;
+          });
+
+          HelperService().showAdvanceFilter(
+            context,
+            _formKey,
+            () {
+              if (_formKey.currentState!.validate()) {
+                // Perform any necessary action before closing the dialog
+                fetchValue();
+                shows = true;
+                Navigator.of(context).pop(); // Close the dialog
+              }
+            },
+          );
+        },
+        onTap1: shows
+            ? () {
+                context.read<JobLogProvider>().getPropertyList();
+                setState(() {
+                  shows = false;
+                });
+              }
+            : null,
       ),
-      body: Consumer<JobLogProvider>(
-        builder: (context, jobLogProvider, _) {
+      body: Consumer<JobLogProvider>(builder: (context, jobLogProvider, _) {
+        if (jobLogProvider.isPropertyLoading &&
+            jobLogProvider.listProperties.isEmpty) {
+          return Center(
+              child: CupertinoActivityIndicator(
+            radius: 20.0,
+            animating: true,
+            color: globalColor,
+          ));
+        } else if (jobLogProvider.listProperties.isEmpty) {
+          return const Center(
+            child: Text(
+              'No data available',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        } else {
           return ListView.builder(
             controller: _scrollController,
             itemCount: jobLogProvider.listProperties.length +
                 (jobLogProvider.isPropertyLoading ? 1 : 0),
             itemBuilder: (context, index) {
-              if (index < jobLogProvider.listProperties.length) {
+              if (jobLogProvider.listProperties.isNotEmpty &&
+                  index < jobLogProvider.listProperties.length) {
                 final property = jobLogProvider.listProperties[index];
                 return GestureDetector(
                   onTap: () {
@@ -81,10 +124,9 @@ class _PropertyListPageState extends State<PropertyListPage> {
                           Stack(
                             children: [
                               //view image
-                              if(property.images != null)
-                              HelperService().getImageCicularImage(
-                                property.images![0],
-                              ),
+                              if (property.images != null)
+                                HelperService().getImageCicularImage(
+                                    property.images![0], 80, 80),
                               //fav icon
                               Positioned(
                                 top: 4,
@@ -118,7 +160,7 @@ class _PropertyListPageState extends State<PropertyListPage> {
                                       ],
                                     ),
                                     HelperService().getTextFieldContainer(
-                                        property.title!, titleTextStyle)
+                                        "Apartment", titleTextStyle)
                                   ],
                                 ),
 
@@ -128,7 +170,7 @@ class _PropertyListPageState extends State<PropertyListPage> {
                                 // Title
                                 //show Text Field
                                 HelperService().getTextFieldStyle(
-                                    'Woodland Apartment', titleStyle),
+                                    property.title!, titleStyle),
 
                                 // Address
                                 //show Text Field
@@ -150,7 +192,10 @@ class _PropertyListPageState extends State<PropertyListPage> {
                                     //Use size box to give space
                                     HelperService().getSizedboxwidth(4),
                                     //show Text Field
-                                    HelperService().getTextField("1,225"),
+                                    HelperService().getTextField(
+                                        property.areaSqFt != null
+                                            ? property.areaSqFt.toString()
+                                            : "1,225"),
                                     //Use size box to give space
                                     HelperService().getSizedboxwidth(12),
 
@@ -164,7 +209,8 @@ class _PropertyListPageState extends State<PropertyListPage> {
                                     Spacer(),
                                     //show Text Field
                                     HelperService().getTextFieldStyle(
-                                        '\$340/month', dollarSignstyle)
+                                        formatCurrency.format(property.price),
+                                        dollarSignstyle)
                                   ],
                                 ),
                               ],
@@ -193,8 +239,8 @@ class _PropertyListPageState extends State<PropertyListPage> {
               }
             },
           );
-        },
-      ),
+        }
+      }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: globalColor,
         child: Icon(Icons.analytics),
@@ -203,5 +249,9 @@ class _PropertyListPageState extends State<PropertyListPage> {
         },
       ),
     );
+  }
+
+  fetchValue() async {
+    await context.read<JobLogProvider>().filterData();
   }
 }

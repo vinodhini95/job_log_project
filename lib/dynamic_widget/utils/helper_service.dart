@@ -1,10 +1,7 @@
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_auth_elevator_btn.dart';
-import 'package:gnb_project/dynamic_widget/dynamic_code/app_text_field.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/dropdown_text_field.dart';
 import 'package:gnb_project/dynamic_widget/utils/colors.dart';
 import 'package:gnb_project/dynamic_widget/utils/styles.dart';
@@ -16,12 +13,6 @@ class HelperService {
   void showAdvanceFilter(
     BuildContext context,
     GlobalKey<FormState> formKey,
-    TextEditingController startDateController,
-    TextEditingController endDateController,
-    void Function()? onStarDateTab,
-    String? Function(String?)? startDatevalidator,
-    void Function()? onEndDateTab,
-    String? Function(String?)? endDatevalidator,
     void Function()? onTab,
   ) {
     showDialog(
@@ -65,35 +56,30 @@ class HelperService {
                                 labelText: 'Select Location',
                                 listData: jobLogProvider.locations,
                               ),
+                              getCenterTextAlign("Tags"),
                               SizedBox(height: 10),
+                              DropdownTextField(
+                                onchangeValue: (value) {
+                                  jobLogProvider.setTags(value!);
+                                },
+                                selectedValue: jobLogProvider.selectedTagsValue,
+                                labelText: 'Select Tags',
+                                listData: jobLogProvider.tags,
+                              ),
+                              SizedBox(height: 10),
+                              DropdownTextField(
+                                onchangeValue: (value) {
+                                  jobLogProvider.setStatus(value!);
+                                },
+                                selectedValue:
+                                    jobLogProvider.selectedstatusValue,
+                                labelText: 'Select Status',
+                                listData: jobLogProvider.status,
+                              ),
                             ],
                           );
                         },
                       ),
-                      getCenterTextAlign("Date Filter"),
-                      SizedBox(height: 10),
-                      AppTextFormField(
-                        isRequired: false,
-                        controller: startDateController,
-                        readOnly: true,
-                        labelText: "Start Date",
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        suffixIcon: Icons.calendar_today,
-                        suffixIconOnTap: onStarDateTab,
-                        validator: startDatevalidator,
-                      ),
-                      SizedBox(height: 10),
-                      AppTextFormField(
-                        isRequired: false,
-                        controller: endDateController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        readOnly: true,
-                        labelText: "End Date",
-                        suffixIcon: Icons.calendar_today,
-                        suffixIconOnTap: onEndDateTab,
-                        validator: endDatevalidator,
-                      ),
-                      SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -155,8 +141,8 @@ class HelperService {
       ),
       child: RangeSlider(
         values: priceRange,
-        min: 1,
-        max: 10,
+        min: 50000,
+        max: 200000,
         divisions: 100,
         labels: RangeLabels(
           "₹${priceRange.start.toInt()}",
@@ -203,7 +189,7 @@ class HelperService {
   }
 
   //get circular Image
-  getImageCicularImage(String filePath) {
+  getImageCicularImage(String filePath, double height, double width) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: CachedNetworkImage(
@@ -211,8 +197,8 @@ class HelperService {
         imageUrl: filePath.isNotEmpty
             ? filePath
             : 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dvilla&psig=AOvVaw3XPEJWzhm5YocHrk4LjwXg&ust=1748437256275000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCNiO3b7aw40DFQAAAAAdAAAAABAE',
-        height: 80,
-        width: 80,
+        height: height,
+        width: width,
         placeholder: (context, url) =>
             const Center(child: CircularProgressIndicator()),
         errorWidget: (context, url, error) => const Icon(Icons.error),

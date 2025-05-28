@@ -34,4 +34,18 @@ class ApiService {
     }
     
   }
+//filter data from server side method
+  Future<Map<String, dynamic>> fetchfilterPropertylist(num priceMin,num priceMax,String selectedLocation,String selectedTags,String selectedStatus,int page, int limit) async {
+    try {
+     var url = "$property?min_price=$priceMin&max_price=$priceMax&location=$selectedLocation&tags=$selectedTags=$selectedStatus Friendlypage=$page&page_size=$limit";
+     var response = await dynamicApiService.get(url);
+     return response;
+    }catch(error){
+       return {
+        "response": null
+      };
+    }
+    
+  }
+  
 }

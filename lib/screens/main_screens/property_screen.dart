@@ -58,12 +58,8 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                       // Main Image
                       if (widget.property.images != null &&
                           widget.property.images!.isNotEmpty)
-                        Image.network(
-                          widget.property.images![0],
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
+                          HelperService().getImageCicularImage(widget.property.images![0], 200, double.infinity),
+                       
 
                       // Small Preview Images
                       if (widget.property.images != null &&
@@ -79,12 +75,7 @@ class _PropertyDetailPageState extends State<PropertyDetailPage> {
                                   padding: const EdgeInsets.all(4.0),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      imagePath,
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: HelperService().getImageCicularImage(imagePath, 100, 100),
                                   ),
                                 );
                               }),
@@ -204,12 +195,7 @@ class GalleryGrid extends StatelessWidget {
         ),
         itemBuilder: (_, index) => ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: Image.network(
-            images[index],
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
+          child: HelperService().getImageCicularImage(images[index], 60, 60),
         ),
       ),
     );

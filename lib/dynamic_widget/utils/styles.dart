@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/utils/colors.dart';
+import 'package:intl/intl.dart';
 
+final formatCurrency = NumberFormat.simpleCurrency(locale: 'en_US');
 BorderRadius buttonBorderRadius = BorderRadius.circular(20.0);
 TextStyle? appTextStyle = TextStyle(
   fontSize: 16,

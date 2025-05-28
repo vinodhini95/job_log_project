@@ -41,19 +41,18 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         pickedFile = await picker.pickImage(source: ImageSource.camera);
       } else {
         // For Android or iOS (or desktop fallback)
-        pickedFile = await picker.pickImage(source: ImageSource.camera);
+        pickedFile = await picker.pickImage(source: ImageSource.camera,preferredCameraDevice: CameraDevice.rear);
       }
 
       if (pickedFile != null) {
         setState(() {
           _pickedImage = pickedFile;
         });
-        print("Picked file: ${pickedFile.path}");
-      } else {
-        print("User canceled or permission denied.");
       }
     } catch (e) {
-      print("Error picking image: $e");
+      if (kDebugMode) {
+        print("Error picking image: $e");
+      }
     }
   }
 
@@ -99,76 +98,78 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         title: "Take Photo",
         backButton: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            /// Dropdown to select property
-            DropdownTextField(
-              onchangeValue: (value) =>
-                  setState(() => _selectedPropertyId = value),
-              selectedValue: _selectedPropertyId,
-              labelText: 'Select Property ID',
-              listData: _propertyIds,
-            ),
-            const SizedBox(height: 20),
-
-            /// Name of property
-            AppTextFormField(
-              isRequired: true,
-              controller: textFieldController,
-              readOnly: false,
-              labelText: "Property Name",
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Property Name Requeried";
-                }
-
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-
-            /// Take or Retry button
-            if (_pickedImage == null)
-              AppElevatorButton(
-                label: "Take Photo",
-                onPressed: pickImage,
-                icon: Icons.camera_alt_outlined,
-              )
-            else
-              AppElevatorButton(
-                label: "Retry",
-                onPressed: _retryImage,
-                icon: Icons.refresh,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              /// Dropdown to select property
+              DropdownTextField(
+                onchangeValue: (value) =>
+                    setState(() => _selectedPropertyId = value),
+                selectedValue: _selectedPropertyId,
+                labelText: 'Select Property ID',
+                listData: _propertyIds,
               ),
-
-            const SizedBox(height: 20),
-
-            /// Preview Image
-            if (_pickedImage != null)
-              Container(
-                height: 250,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
+              const SizedBox(height: 20),
+        
+              /// Name of property
+              AppTextFormField(
+                isRequired: true,
+                controller: textFieldController,
+                readOnly: false,
+                labelText: "Property Name",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Property Name Requeried";
+                  }
+        
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+        
+              /// Take or Retry button
+              if (_pickedImage == null)
+                AppElevatorButton(
+                  label: "Take Photo",
+                  onPressed: pickImage,
+                  icon: Icons.camera_alt_outlined,
+                )
+              else
+                AppElevatorButton(
+                  label: "Retry",
+                  onPressed: _retryImage,
+                  icon: Icons.refresh,
                 ),
-                child: kIsWeb
-                    ? Image.network(_pickedImage!.path, fit: BoxFit.cover)
-                    : Image.file(File(_pickedImage!.path), fit: BoxFit.cover),
-              ),
-
-            const SizedBox(height: 20),
-
-            /// Submit button
-            if (_pickedImage != null)
-              AppElevatorButton(
-                label: "Submit Image",
-                onPressed: _submitImage,
-                icon: Icons.check_circle_outline,
-              ),
-          ],
+        
+              const SizedBox(height: 20),
+        
+              /// Preview Image
+              if (_pickedImage != null)
+                Container(
+                  height: 250,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: kIsWeb
+                      ? Image.network(_pickedImage!.path, fit: BoxFit.cover)
+                      : Image.file(File(_pickedImage!.path), fit: BoxFit.cover),
+                ),
+        
+              const SizedBox(height: 20),
+        
+              /// Submit button
+              if (_pickedImage != null)
+                AppElevatorButton(
+                  label: "Submit Image",
+                  onPressed: _submitImage,
+                  icon: Icons.check_circle_outline,
+                ),
+            ],
+          ),
         ),
       ),
     );

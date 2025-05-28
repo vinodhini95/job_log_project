@@ -8,10 +8,9 @@ import 'package:gnb_project/service/service_file/api_service.dart';
 import '../model/job_log_model.dart';
 
 class JobLogProvider extends ChangeNotifier {
-
   ApiService _apiService = ApiService();
 
-   // set variable for serach list
+  // set variable for serach list
   List<JobLogmodel> searchJobModel = [];
   List<JobLogmodel> get _searchJobModel => searchJobModel;
 
@@ -20,7 +19,7 @@ class JobLogProvider extends ChangeNotifier {
   List<JobLogmodel> get listJobLogs => _listJobLogs;
 
   //set variable for list of joblogs
-  final List<Propertylist> _listProperties = [];
+  List<Propertylist> _listProperties = [];
   List<Propertylist> get listProperties => _listProperties;
   final List<Property> _listProperty = [];
   List<Property> get listProperty => _listProperty;
@@ -36,12 +35,22 @@ class JobLogProvider extends ChangeNotifier {
   bool _hasPropertyMore = true;
   bool get isPropertyLoading => _isPropertyLoading;
   bool get hasPropertyMore => _hasPropertyMore;
-  RangeValues _priceRange = RangeValues(1, 10);
+  RangeValues _priceRange = RangeValues(50000, 200000);
   RangeValues get priceRange => _priceRange;
-  final List<String> locations = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai'];
-  String _selectedLocationValue = "Chennai";
+  final List<String> locations = [
+    'Hillview',
+    'Metrocity',
+    'Beachside',
+    'Townsburg'
+  ];
+  String _selectedLocationValue = "Hillview";
   String get selectedLocationValue => _selectedLocationValue;
-
+  final List<String> tags = ['New', 'Available', 'Furnished', 'Luxury'];
+  String _selectedTagsValue = "Furnished";
+  String get selectedTagsValue => _selectedTagsValue;
+  final List<String> status = ['Sold', 'Available'];
+  String _selectedstatusValue = "Available";
+  String get selectedstatusValue => _selectedstatusValue;
   //fetch Data from the server and store in provider method
   Future<List<JobLogmodel>> fetchJobLogs() async {
     if (_isLoading || !_hasMore) return _listJobLogs;
@@ -51,13 +60,12 @@ class JobLogProvider extends ChangeNotifier {
     try {
       final data = await _apiService.fetchJobLogs(currentPage, 20);
 
-      if (data['response'] != null &&
-          data['response']['logs'] != null) {
+      if (data['response'] != null && data['response']['logs'] != null) {
         final List<dynamic> newLogs = data['response']['logs'];
         for (var jobLog in newLogs) {
-           _listJobLogs.add(JobLogmodel.fromJson(jobLog));
+          _listJobLogs.add(JobLogmodel.fromJson(jobLog));
         }
-       
+
         currentPage++;
 
         if (newLogs.isEmpty || newLogs.length < 20) {
@@ -75,38 +83,51 @@ class JobLogProvider extends ChangeNotifier {
     }
   }
 
-
   //set price Range Value
-  setPriceRange(RangeValues rangeValue){
-   _priceRange = rangeValue;
-   notifyListeners();
+  setPriceRange(RangeValues rangeValue) {
+    _priceRange = rangeValue;
+    notifyListeners();
   }
- //set price Range Value
-  setLocation(String selectedValue){
-   _selectedLocationValue = selectedValue;
-   notifyListeners();
+
+  //set location Value
+  setLocation(String selectedValue) {
+    _selectedLocationValue = selectedValue;
+    notifyListeners();
+  }
+
+  //set tags  Value
+  setTags(String selectedValue) {
+    _selectedTagsValue = selectedValue;
+    notifyListeners();
+  }
+
+  //set status  Value
+  setStatus(String selectedValue) {
+    _selectedstatusValue = selectedValue;
+    notifyListeners();
   }
 
   //added property
-  addeProperty(Property property){
+  addeProperty(Property property) {
     _listProperty.add(property);
     notifyListeners();
   }
 
- Future<List<Propertylist>> getPropertyList()async{
+  Future<List<Propertylist>> getPropertyList() async {
     if (_isPropertyLoading || !_hasPropertyMore) return _listProperties;
 
     _isPropertyLoading = true;
 
     try {
-      final data = await _apiService.fetchPropertylist(currentPropertyPage, pageSize);
+      final data =
+          await _apiService.fetchPropertylist(currentPropertyPage, pageSize);
 
       if (data['properties'] != null) {
         final List<dynamic> newProperties = data['properties'];
         for (var property in newProperties) {
-           _listProperties.add(Propertylist.fromJson(property));
+          _listProperties.add(Propertylist.fromJson(property));
         }
-       
+
         currentPropertyPage++;
 
         if (newProperties.isEmpty || newProperties.length < pageSize) {
@@ -123,5 +144,32 @@ class JobLogProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  }
 
+  filterData() async {
+    try {
+      currentPropertyPage = 1;
+      final data = await _apiService.fetchfilterPropertylist(
+          priceRange.start,
+          priceRange.end,
+          selectedLocationValue,
+          selectedTagsValue,
+          selectedstatusValue,
+          currentPropertyPage,
+          pageSize);
+      if (data['properties'] != null) {
+        final List<dynamic> newProperties = data['properties'];
+        if(newProperties.isEmpty){
+          _listProperties = [];
+        }
+        for (var property in newProperties) {
+          _listProperties.add(Propertylist.fromJson(property));
+        }
+      }
+      return _listProperties;
+    } catch (e) {
+      return _listProperties;
+    } finally {
+      notifyListeners();
+    }
+  }
+}

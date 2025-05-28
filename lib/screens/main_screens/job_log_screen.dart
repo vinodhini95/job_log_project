@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gnb_project/dynamic_widget/utils/colors.dart';
 import 'package:gnb_project/dynamic_widget/utils/date_format.dart';
-import 'package:gnb_project/dynamic_widget/utils/helper_service.dart';
 import 'package:gnb_project/provider/job_log_provider.dart';
 import 'package:gnb_project/dynamic_widget/dynamic_code/app_bar.dart';
 import 'package:provider/provider.dart';
@@ -14,17 +13,11 @@ class JobListData extends StatefulWidget {
 
 class _JobListDataState extends State<JobListData> {
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-  bool shows = false;
-  DateTime? _startDate;
-  DateTime? _endDate;
+
   bool hasValidationError = false;
-  final _formKey = GlobalKey<FormState>();
+  
   @override
   void initState() {
-    _startDate = DateTime.now();
-    _endDate = DateTime.now();
     super.initState();
     final provider = Provider.of<JobLogProvider>(context, listen: false);
     provider.fetchJobLogs();
@@ -53,80 +46,7 @@ class _JobListDataState extends State<JobListData> {
         backButton: true,
         appBar: AppBar(),
         title: "Job List",
-        onTap: () {
-          setState(() {
-            shows = true;
-          });
-
-          HelperService().showAdvanceFilter(
-            context,
-            _formKey,
-            _startDateController,
-            _endDateController,
-            () async {
-              await selectDate(context, _startDateController, _startDate);
-              // fetchData(equipmentType);
-            },
-            (value) {
-              if (value == null || value.isEmpty) {
-                if (_endDateController.text.isEmpty) {
-                  hasValidationError = true;
-                  return 'Please select an end date';
-                }
-              }
-              if (_endDateController.text.isNotEmpty && value!.isNotEmpty) {
-                DateTime startDate = allDynamicDateFormat.parse(value);
-                DateTime endDate = allDynamicDateFormat.parse(
-                  _endDateController.text,
-                );
-                if (endDate.isBefore(startDate)) {
-                  hasValidationError = true;
-                  return 'Start date should be before end date';
-                }
-              }
-              hasValidationError = false;
-              return null;
-            },
-            () async {
-              await selectDate(context, _endDateController, _endDate);
-            },
-            (value) {
-              if (value == null || value.isEmpty) {
-                hasValidationError = true;
-                return 'Please select an end date';
-              }
-              if (_startDateController.text.isNotEmpty && value.isNotEmpty) {
-                DateTime startDate = allDynamicDateFormat.parse(
-                  _startDateController.text,
-                );
-                DateTime endDate = allDynamicDateFormat.parse(value);
-
-                if (startDate.isAfter(endDate)) {
-                  hasValidationError = true;
-                  return 'End date should be after the start date';
-                }
-              }
-              hasValidationError = false;
-              return null;
-            },
-            () {
-              if (_formKey.currentState!.validate()) {
-                // Perform any necessary action before closing the dialog
-                // fetchData();
-                shows = true;
-                Navigator.of(context).pop(); // Close the dialog
-              }
-            },
-          );
-        },
-        onTap1: shows
-            ? () {
-                setState(() {
-                  shows = false;
-                });
-              }
-            : null,
-      ),
+       ),
       body: Consumer<JobLogProvider>(
         builder: (context, provider, child) {
           return ListView.builder(
@@ -179,25 +99,5 @@ class _JobListDataState extends State<JobListData> {
     );
   }
 
-  Future<void> selectDate(
-    BuildContext context,
-    TextEditingController controller,
-    DateTime? initialDate,
-  ) async {
-    DateTime? pickedDate = await HelperService().selectDatePicker(context);
-
-    if (pickedDate != null) {
-      setState(() {
-        if (controller == _startDateController) {
-          _startDate = pickedDate;
-          _endDate = _endDate ?? pickedDate;
-        } else if (controller == _endDateController) {
-          _endDate = pickedDate;
-        }
-        // Format the picked date to show only the date
-        controller.text = allDynamicDateFormat.format(pickedDate);
-        _formKey.currentState!.validate();
-      });
-    }
-  }
+  
 }
